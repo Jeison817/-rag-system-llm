@@ -1,52 +1,133 @@
-# 🔍 RAG System: LLM + FAISS + Hybrid Search Evaluation
+📚 Sistema RAG con LLM y Evaluación de Respuestas
 
-![Python](https://img.shields.io/badge/Python-3.9+-blue?style=for-the-badge&logo=python)
-![HuggingFace](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Models-yellow?style=for-the-badge)
-![License](https://img.shields.io/badge/License-MIT-green?style=for-the-badge)
+Implementación completa de un sistema Retrieval-Augmented Generation (RAG) en Python, que integra búsqueda híbrida, reranking y generación de lenguaje natural usando Microsoft Phi-2 (cuantizado en 4-bit).
 
-Este proyecto implementa un sistema **RAG (Retrieval-Augmented Generation)** avanzado, especializado en el análisis de normativa financiera peruana (Resolución SBS). Utiliza una arquitectura híbrida de búsqueda y modelos cuantizados para garantizar precisión y trazabilidad.
+El sistema está diseñado para responder preguntas basadas exclusivamente en documentos PDF, reduciendo alucinaciones y garantizando trazabilidad a nivel de oración.
 
----
+🧠 Descripción General
 
-## 🚀 Características Principales
+Este proyecto implementa un pipeline RAG moderno que combina:
 
-* **🧠 Brain:** Microsoft **Phi-2** (2.7B) cuantizado en 4-bits para ejecución eficiente.
-* **🔎 Búsqueda Híbrida:** Combinación de **FAISS** (densidad semántica) + **BM25** (fidelidad léxica).
-* **🎯 Reranking:** Re-clasificación de contextos con **Cross-Encoder** para máxima relevancia.
-* **🛡️ Hallucination Guard:** Sistema de evaluación automática con **Grounding Score** y métricas NLP (BLEU/ROUGE).
-* **📍 Trazabilidad:** Citación automática por oración vinculada directamente a los fragmentos del PDF.
+Recuperación semántica (vectorial)
+Recuperación léxica (BM25)
+Reordenamiento (reranking)
+Generación controlada con LLM
+Evaluación automática de calidad
+🔄 Pipeline
+PDFs → Chunking → Embeddings → FAISS (HNSW) + BM25 → Reranking → Phi-2 → Respuesta con citas + métricas
+🚀 Características Principales
 
----
+✅ Búsqueda híbrida (semántica + léxica)
+✅ Reranking con Cross-Encoder
+✅ Generación eficiente con LLM cuantizado (4-bit)
+✅ Citas por oración (trazabilidad completa)
+✅ Evaluación automática (Grounding, BLEU, ROUGE)
+✅ Soporte multilingüe (español / inglés)
 
-## 🛠️ Arquitectura del Pipeline
+⚙️ Arquitectura del Sistema
+Etapa	Tecnología	Función
+Ingesta	pypdf	Extracción de texto desde PDFs
+Chunking	Custom	División en fragmentos con solapamiento
+Embeddings	sentence-transformers	Representación vectorial semántica
+Índice vectorial	FAISS HNSW	Búsqueda eficiente por similitud
+Índice léxico	BM25Okapi	Recuperación basada en palabras clave
+Fusión híbrida	FAISS + BM25	Score combinado ponderado
+Reranking	Cross-Encoder	Reordenamiento de relevancia
+Generación	microsoft/phi-2	Respuestas naturales
+Evaluación	BLEU, ROUGE, Grounding	Medición de calidad
+📦 Instalación
+pip install -U transformers accelerate bitsandbytes sentencepiece
+pip install faiss-cpu sentence-transformers datasets
+pip install rank_bm25 rouge_score nltk pypdf
 
-El sistema sigue un flujo de procesamiento de lenguaje natural de extremo a extremo:
+⚠️ Recomendación: usar GPU (Google Colab T4 o superior) para ejecutar Phi-2 en 4-bit.
 
-1.  **Ingesta:** Carga de PDFs y segmentación (Chunking).
-2.  **Indexing:** Generación de Embeddings y almacenamiento en FAISS.
-3.  **Retrieval:** Búsqueda combinada (Semántica + Palabras clave).
-4.  **Rerank:** Filtrado de los top-K mejores fragmentos.
-5.  **Generation:** Respuesta del LLM fundamentada en el contexto.
-6.  **Evaluación:** Cálculo de fidelidad (Grounding) y métricas de calidad.
+▶️ Uso
+1. Preparar documentos
+import os
+os.makedirs("/content/docs", exist_ok=True)
 
----
+Sube tus archivos PDF a la carpeta /content/docs.
 
-## 🧪 Ejemplo de Implementación
-
-```python
-# Proceso de consulta y validación
+2. Ejecutar pipeline
 query = "¿Qué es Gestión de activos y pasivos?"
 
-# 1. Recuperación y Reranking
-docs = retrieve(query, k=10)
-top = rerank(query, docs, top_k=3)
-
-# 2. Generación con Grounding
+docs    = retrieve(query, k=10)
+top     = rerank(query, docs, top_k=3)
 context = "\n".join(c["text"] for c in top)
-answer = ask_llm(context, query)
 
-# 3. Evaluación de alucinaciones
+answer  = ask_llm(context, query)
+
 score, verdict = hallucination_guard(answer, top)
 
-print(f"Respuesta: {answer}")
-print(f"Grounding Score: {score} {verdict}")
+print("RESPUESTA:\n", answer)
+print("\nGrounding score:", score, verdict)
+3. Evaluación en lote
+
+El notebook incluye una sección para evaluar múltiples preguntas y generar automáticamente métricas:
+
+BLEU
+ROUGE
+Grounding Score
+📊 Métricas de Evaluación
+Métrica	Descripción	Interpretación
+Grounding Score	Proporción de términos sustentados en el contexto	≥ 0.70 → confiable
+BLEU-1	Coincidencia léxica	0.1 – 0.3 aceptable
+ROUGE-L	Coincidencia estructural	Mayor = mejor
+🧾 Veredictos
+✅ Fundamentado → ≥ 0.70
+⚠️ Advertencia → 0.40 – 0.69
+❌ Alucinación → < 0.40
+🧪 Resultados de Ejemplo
+
+Evaluación sobre documentos regulatorios:
+
+Consulta	Grounding	Veredicto
+Flujos en instrumentos de deuda	1.000	✅
+Indicador GHO mínimo	0.758	✅
+Función del comité GAP	0.875	✅
+🏗️ Estructura del Proyecto
+📁 docs/
+📓 PF_IAGenerativa_phi2.ipynb
+📌 Secciones del Notebook
+0. Instalación
+1. Ingesta de documentos
+2. Chunking
+3. Embeddings
+4. FAISS
+5. Búsqueda híbrida
+6. Reranking
+7. LLM (Phi-2)
+8. Generación
+9. Citas por oración
+10. Grounding Score
+11. BLEU / ROUGE
+12. Consulta individual
+13. Consultas en lote
+14. Reporte final
+🔧 Parámetros Importantes
+Parámetro	Valor	Descripción
+chunk_size	400	Tamaño del fragmento
+overlap	100	Solapamiento
+k	10	Recuperación inicial
+top_k	3	Contexto final
+alpha	0.7	Peso FAISS vs BM25
+efSearch	50	Precisión en búsqueda
+temperature	0.3	Control de aleatoriedad
+🧩 Consideraciones Técnicas
+
+Phi-2 usa formato tipo:
+
+Instruct: ...
+Output:
+No requiere chat_template
+Cuantización en 4-bit reduce consumo de memoria
+Embeddings multilingües permiten consultas en español
+🎯 Aplicaciones
+Sistemas de preguntas sobre documentos legales
+Asistentes académicos
+Análisis de normativa
+QA sobre PDFs empresariales
+📄 Licencia
+
+Proyecto desarrollado con fines académicos y de investigación.
