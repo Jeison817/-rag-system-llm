@@ -1,46 +1,35 @@
-RAG System with LLM, FAISS and Evaluation
+🔍 RAG System — LLM + FAISS + Evaluation
 
-Sistema de Retrieval-Augmented Generation (RAG) aplicado a documentos PDF de normativa financiera peruana.
-El proyecto integra modelos de lenguaje, recuperación híbrida y evaluación automática para generar respuestas fundamentadas y trazables.
+Este proyecto presenta una implementación completa de un sistema RAG (Retrieval-Augmented Generation) aplicado a documentos PDF de normativa financiera peruana.
 
-Objetivo
+Forma parte de un proyecto académico de IA Generativa, donde se integran modelos de lenguaje, búsqueda híbrida y evaluación automática para generar respuestas fundamentadas.
 
-Desarrollar un sistema capaz de:
+🎯 Objetivo
 
-Consultar documentos PDF propios
-Generar respuestas usando un modelo de lenguaje cuantizado (Phi-2 4-bit)
+Construir un sistema capaz de:
+
+Consultar documentos PDF propios (Resolución SBS 1660-2025)
+Generar respuestas con un LLM (Phi-2 cuantizado en 4-bit)
 Reducir alucinaciones mediante grounding
 Evaluar automáticamente la calidad de las respuestas
-Proveer trazabilidad mediante citas por oración
-Arquitectura del sistema
-PDFs 
-→ Chunking (size=400, overlap=100) 
-→ Embeddings 
-→ FAISS (HNSW) + BM25 
-→ Reranking (Cross-Encoder) 
-→ LLM (Phi-2 4-bit) 
-→ Evaluación
-Tecnologías utilizadas
-Python
-HuggingFace Transformers
-Microsoft Phi-2 (2.7B parámetros, 4-bit)
-FAISS (HNSW)
-BM25 (rank_bm25)
-SentenceTransformers
-Cross-Encoder (ms-marco-MiniLM-L-6-v2)
-NLTK (BLEU, ROUGE)
-BitsAndBytes
-PyPDF
-Instalación y ejecución
-git clone https://github.com/Jeison817/rag-system-llm.git
-cd rag-system-llm
-pip install -r requirements.txt
-jupyter notebook notebook/PF_IAGenerativa_phi2.ipynb
+Proveer trazabilidad con citas por oración
+🧠 Contexto académico
 
-Antes de ejecutar, agrega tus documentos en:
+Este proyecto integra conceptos clave de IA Generativa:
 
-/content/docs
-Ejemplo de uso
+Retrieval-Augmented Generation (RAG)
+Búsqueda híbrida (semántica + léxica)
+Modelos de lenguaje cuantizados
+Evaluación automática de texto generado
+Reducción de alucinaciones en LLMs
+
+El sistema implementa un pipeline completo desde documentos hasta respuestas evaluadas.
+
+⚙️ ¿Cómo funciona?
+
+PDF → Chunking → Embeddings → FAISS + BM25 → Reranking → LLM → Evaluación
+
+🧪 Ejemplo de uso
 query = "¿Qué es Gestión de activos y pasivos?"
 
 docs    = retrieve(query, k=10)
@@ -54,62 +43,61 @@ score, verdict = hallucination_guard(answer, top)
 
 print("RESPUESTA:\n", answer)
 print("\nGrounding score:", score, verdict)
-Evaluación
+🔖 Sistema de citas
 
-El sistema incluye métricas automáticas para medir calidad y confiabilidad:
+El sistema incluye trazabilidad de fuentes:
 
-Métrica	Descripción	Interpretación
-Grounding Score	% de términos alineados al contexto	> 0.70 confiable
-BLEU-1	Coincidencia léxica con referencia	0.1 – 0.3 aceptable
-ROUGE-L	Coherencia estructural	Complementaria
-Resultados
-=================================================================
-Pregunta                       Grounding     Veredicto
------------------------------------------------------------------
-¿Qué flujos se consideran...     1.0000      FUNDAMENTADO
-¿Cuál es el nivel mínimo...      0.7586      FUNDAMENTADO
-¿Cuál es una función del...        ...       FUNDAMENTADO
-=================================================================
-Sistema de citas
+Cada respuesta se divide en oraciones
+Cada oración se vincula a un fragmento del PDF
+Permite verificar el origen de cada afirmación
 
-Cada respuesta generada:
+Esto mejora la confiabilidad y reduce alucinaciones.
 
-Se divide en oraciones
-Se vincula con fragmentos del documento (chunks)
-Permite identificar la fuente de cada afirmación
+📊 Evaluación
 
-Esto mejora la interpretabilidad y reduce alucinaciones.
+Se utilizan métricas automáticas para medir la calidad:
 
-Estructura del proyecto
-rag-system-llm/
-├── notebook/
-│   └── PF_IAGenerativa_phi2.ipynb
-├── assets/
-│   └── pipeline_arquitectura.png
-├── requirements.txt
-└── README.md
-Alcance
+Grounding Score → alineación con el contexto (> 0.70 confiable)
+BLEU-1 → coincidencia léxica
+ROUGE-L → coherencia estructural
+🛠️ Tecnologías
+Python
+HuggingFace Transformers
+Microsoft Phi-2 (2.7B, 4-bit)
+FAISS (HNSW)
+BM25 (rank_bm25)
+SentenceTransformers
+Cross-Encoder (ms-marco-MiniLM-L-6-v2)
+NLTK (BLEU, ROUGE)
+BitsAndBytes
+PyPDF
+🚀 Ejecución
+git clone https://github.com/Jeison817/rag-system-llm.git
+cd rag-system-llm
+pip install -r requirements.txt
+jupyter notebook notebook/PF_IAGenerativa_phi2.ipynb
+
+⚠️ Agrega tus PDFs en:
+
+/content/docs
+📊 Alcance del proyecto
 
 Este proyecto es:
 
-Un sistema funcional de RAG
-Implementación de búsqueda híbrida (semántica + léxica)
-Integración de modelos cuantizados
-Pipeline completo de evaluación
-Sistema con trazabilidad de respuestas
+✔️ Un sistema RAG funcional
+✔️ Enfocado en aprendizaje avanzado
+✔️ Implementación completa de pipeline NLP
+✔️ Sistema con trazabilidad de respuestas
 
 No es:
 
-Un sistema en producción
-Escalable a gran volumen
-Optimizado para latencia
-Contribuciones
-
-El proyecto demuestra:
-
-Integración de LLMs ligeros en entornos limitados
-Uso combinado de FAISS y BM25
+❌ Un sistema en producción
+❌ Escalable a gran volumen
+❌ Optimizado para latencia
+📈 Lo que demuestra
+Integración de LLMs cuantizados en aplicaciones reales
+Uso de FAISS + BM25 (búsqueda híbrida)
 Reranking con Cross-Encoder
-Evaluación automática con múltiples métricas
+Evaluación automática de respuestas
 Reducción de alucinaciones mediante grounding
-Autor
+🙋‍♂️ Autor
