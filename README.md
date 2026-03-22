@@ -1,133 +1,168 @@
-📚 Sistema RAG con LLM y Evaluación de Respuestas
+# 📚 Sistema RAG con LLM y Métricas de Evaluación
 
-Implementación completa de un sistema Retrieval-Augmented Generation (RAG) en Python, que integra búsqueda híbrida, reranking y generación de lenguaje natural usando Microsoft Phi-2 (cuantizado en 4-bit).
+Un pipeline completo de **Retrieval-Augmented Generation (RAG)** implementado en Python que combina búsqueda semántica híbrida, reranking y generación de respuestas con el modelo **Microsoft Phi-2 (4-bit)**, diseñado para responder preguntas a partir de documentos PDF con alta fidelidad y trazabilidad.
 
-El sistema está diseñado para responder preguntas basadas exclusivamente en documentos PDF, reduciendo alucinaciones y garantizando trazabilidad a nivel de oración.
+---
 
-🧠 Descripción General
+## 🧠 ¿Qué hace este proyecto?
 
-Este proyecto implementa un pipeline RAG moderno que combina:
+El sistema responde preguntas usando **exclusivamente** la información contenida en los documentos proporcionados, minimizando alucinaciones y asegurando trazabilidad por oración en cada respuesta.
 
-Recuperación semántica (vectorial)
-Recuperación léxica (BM25)
-Reordenamiento (reranking)
-Generación controlada con LLM
-Evaluación automática de calidad
-🔄 Pipeline
-PDFs → Chunking → Embeddings → FAISS (HNSW) + BM25 → Reranking → Phi-2 → Respuesta con citas + métricas
-🚀 Características Principales
+### Pipeline completo:
 
-✅ Búsqueda híbrida (semántica + léxica)
-✅ Reranking con Cross-Encoder
-✅ Generación eficiente con LLM cuantizado (4-bit)
-✅ Citas por oración (trazabilidad completa)
-✅ Evaluación automática (Grounding, BLEU, ROUGE)
-✅ Soporte multilingüe (español / inglés)
+```
+PDFs → Chunking → Embeddings → FAISS HNSW + BM25 → Reranker → Phi-2 (4-bit) → Respuesta con citas + métricas
+```
 
-⚙️ Arquitectura del Sistema
-Etapa	Tecnología	Función
-Ingesta	pypdf	Extracción de texto desde PDFs
-Chunking	Custom	División en fragmentos con solapamiento
-Embeddings	sentence-transformers	Representación vectorial semántica
-Índice vectorial	FAISS HNSW	Búsqueda eficiente por similitud
-Índice léxico	BM25Okapi	Recuperación basada en palabras clave
-Fusión híbrida	FAISS + BM25	Score combinado ponderado
-Reranking	Cross-Encoder	Reordenamiento de relevancia
-Generación	microsoft/phi-2	Respuestas naturales
-Evaluación	BLEU, ROUGE, Grounding	Medición de calidad
-📦 Instalación
+---
+
+## ⚙️ Componentes del Sistema
+
+| Etapa | Tecnología | Descripción |
+|---|---|---|
+| Carga de documentos | `pypdf` | Extracción de texto página por página |
+| Chunking | Custom | Fragmentación con overlap (size=400, overlap=100) |
+| Embeddings | `paraphrase-multilingual-MiniLM-L12-v2` | Vectores semánticos multilingües |
+| Búsqueda semántica | `FAISS HNSW` | Índice jerárquico de grafos navegables |
+| Búsqueda léxica | `BM25Okapi` | Recuperación clásica por palabras clave |
+| Búsqueda híbrida | FAISS + BM25 | Score = α × FAISS + (1−α) × BM25 |
+| Reranking | `cross-encoder/ms-marco-MiniLM-L-6-v2` | Evaluación precisa de pares (query, chunk) |
+| Generación | `microsoft/phi-2` (4-bit) | LLM compacto con cuantización BitsAndBytes |
+| Citas por oración | Custom | Trazabilidad de fuentes en la respuesta |
+| Evaluación | Grounding Score + BLEU + ROUGE | Métricas automáticas de calidad |
+
+---
+
+## 📦 Instalación
+
+```bash
 pip install -U transformers accelerate bitsandbytes sentencepiece
 pip install faiss-cpu sentence-transformers datasets
 pip install rank_bm25 rouge_score nltk pypdf
+```
 
-⚠️ Recomendación: usar GPU (Google Colab T4 o superior) para ejecutar Phi-2 en 4-bit.
+> **Requisito:** GPU recomendada para cargar Phi-2 en 4-bit. Compatible con Google Colab (T4 o superior).
 
-▶️ Uso
-1. Preparar documentos
+---
+
+## 🚀 Uso
+
+### 1. Subir documentos
+
+Crea la carpeta `/content/docs` y sube tus archivos PDF:
+
+```python
 import os
 os.makedirs("/content/docs", exist_ok=True)
+# Sube tus PDFs a la carpeta docs en el panel de archivos
+```
 
-Sube tus archivos PDF a la carpeta /content/docs.
+### 2. Ejecutar el notebook
 
-2. Ejecutar pipeline
+Ejecuta las celdas en orden. El pipeline completo se activa en la **Sección 13 (Consulta)**:
+
+```python
 query = "¿Qué es Gestión de activos y pasivos?"
 
-docs    = retrieve(query, k=10)
-top     = rerank(query, docs, top_k=3)
+docs    = retrieve(query, k=10)        # FAISS + BM25 híbrido
+top     = rerank(query, docs, top_k=3) # Cross-Encoder reranking
 context = "\n".join(c["text"] for c in top)
-
-answer  = ask_llm(context, query)
+answer  = ask_llm(context, query)      # Generación con Phi-2
 
 score, verdict = hallucination_guard(answer, top)
-
 print("RESPUESTA:\n", answer)
 print("\nGrounding score:", score, verdict)
-3. Evaluación en lote
+```
 
-El notebook incluye una sección para evaluar múltiples preguntas y generar automáticamente métricas:
+### 3. Consultas en lote
 
-BLEU
-ROUGE
-Grounding Score
-📊 Métricas de Evaluación
-Métrica	Descripción	Interpretación
-Grounding Score	Proporción de términos sustentados en el contexto	≥ 0.70 → confiable
-BLEU-1	Coincidencia léxica	0.1 – 0.3 aceptable
-ROUGE-L	Coincidencia estructural	Mayor = mejor
-🧾 Veredictos
-✅ Fundamentado → ≥ 0.70
-⚠️ Advertencia → 0.40 – 0.69
-❌ Alucinación → < 0.40
-🧪 Resultados de Ejemplo
+Puedes evaluar múltiples preguntas con referencias usando la sección **"Varias consultas"**, que genera automáticamente un reporte con BLEU, ROUGE y Grounding Score.
 
-Evaluación sobre documentos regulatorios:
+---
 
-Consulta	Grounding	Veredicto
-Flujos en instrumentos de deuda	1.000	✅
-Indicador GHO mínimo	0.758	✅
-Función del comité GAP	0.875	✅
-🏗️ Estructura del Proyecto
-📁 docs/
-📓 PF_IAGenerativa_phi2.ipynb
-📌 Secciones del Notebook
-0. Instalación
-1. Ingesta de documentos
-2. Chunking
-3. Embeddings
-4. FAISS
-5. Búsqueda híbrida
-6. Reranking
-7. LLM (Phi-2)
-8. Generación
-9. Citas por oración
-10. Grounding Score
-11. BLEU / ROUGE
-12. Consulta individual
-13. Consultas en lote
-14. Reporte final
-🔧 Parámetros Importantes
-Parámetro	Valor	Descripción
-chunk_size	400	Tamaño del fragmento
-overlap	100	Solapamiento
-k	10	Recuperación inicial
-top_k	3	Contexto final
-alpha	0.7	Peso FAISS vs BM25
-efSearch	50	Precisión en búsqueda
-temperature	0.3	Control de aleatoriedad
-🧩 Consideraciones Técnicas
+## 📊 Métricas de Evaluación
 
-Phi-2 usa formato tipo:
+| Métrica | Descripción | Umbral |
+|---|---|---|
+| **Grounding Score** | % de términos de la respuesta presentes en el contexto | ✅ ≥ 0.70 |
+| **BLEU-1** | Coincidencia léxica con respuesta de referencia | 0.1–0.3 aceptable |
+| **ROUGE-L** | Secuencia lógica más larga compartida con la referencia | Mayor = mejor |
 
-Instruct: ...
-Output:
-No requiere chat_template
-Cuantización en 4-bit reduce consumo de memoria
-Embeddings multilingües permiten consultas en español
-🎯 Aplicaciones
-Sistemas de preguntas sobre documentos legales
-Asistentes académicos
-Análisis de normativa
-QA sobre PDFs empresariales
-📄 Licencia
+### Veredictos del Grounding Score:
 
-Proyecto desarrollado con fines académicos y de investigación.
+- `✅ FUNDAMENTADO` → score ≥ 0.70
+- `⚠️ ADVERTENCIA` → 0.40 ≤ score < 0.70
+- `❌ ALUCINACIÓN` → score < 0.40
+
+---
+
+## 🧪 Resultados de Ejemplo
+
+Resultados obtenidos sobre la Resolución SBS 1660-2025:
+
+| Pregunta | Grounding | BLEU-1 | ROUGE-L | Veredicto |
+|---|---|---|---|---|
+| Flujos en instrumentos de deuda (ASA) | 1.0000 | — | — | ✅ FUNDAMENTADO |
+| Nivel mínimo del indicador GHO | 0.7586 | — | — | ✅ FUNDAMENTADO |
+| Función del Comité de GAP | 0.8750 | — | — | ✅ FUNDAMENTADO |
+
+---
+
+## 🏗️ Estructura del Proyecto
+
+```
+📁 /content/docs/         ← PDFs de entrada
+📓 PF_IAGenerativa_phi2.ipynb  ← Notebook principal
+```
+
+### Secciones del Notebook:
+
+```
+0. Instalación de librerías
+1. Preparación de carpeta de documentos
+2. Carga de PDFs
+3. Chunking con Overlap
+4. Embeddings
+5. FAISS HNSW
+6. Búsqueda Híbrida (BM25 + FAISS)
+7. Reranker Cross-Encoder
+8. LLM Microsoft Phi-2 (4-bit)
+9. Prompt + Generación de respuestas
+10. Citation per Sentence
+11. Hallucination Guard + Grounding Score
+12. BLEU + ROUGE
+13. Consulta individual
+14. Consultas en lote
+15. Reporte final
+```
+
+---
+
+## 🔧 Parámetros Clave
+
+| Parámetro | Valor | Descripción |
+|---|---|---|
+| `chunk_size` | 400 | Tamaño de cada fragmento de texto |
+| `overlap` | 100 | Solapamiento entre chunks |
+| `k` (retrieval) | 10 | Chunks recuperados por FAISS + BM25 |
+| `top_k` (reranking) | 3 | Chunks finales enviados al LLM |
+| `alpha` | 0.7 | Peso de FAISS vs BM25 en búsqueda híbrida |
+| `M` (HNSW) | 32 | Conexiones por nodo en el grafo |
+| `efConstruction` | 200 | Esfuerzo al construir el índice |
+| `efSearch` | 50 | Esfuerzo al buscar vecinos |
+| `max_new_tokens` | 200 | Longitud máxima de respuesta del LLM |
+| `temperature` | 0.3 | Temperatura de generación (baja = más determinista) |
+
+---
+
+## 📝 Notas
+
+- **Phi-2 vs Qwen:** Phi-2 no soporta `apply_chat_template`, por lo que se usa el formato `Instruct: ... Output:` propio del modelo.
+- **Multilingüe:** El modelo de embeddings `paraphrase-multilingual-MiniLM-L12-v2` soporta español e inglés.
+- **Cuantización 4-bit:** Reduce significativamente el uso de memoria GPU sin pérdida notable de calidad.
+
+---
+
+## 📄 Licencia
+
+Este proyecto fue desarrollado con fines académicos.
