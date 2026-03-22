@@ -1,49 +1,46 @@
-🔍 RAG System with LLM, FAISS & Evaluation
+RAG System with LLM, FAISS and Evaluation
 
-Retrieval-Augmented Generation aplicado a normativa financiera peruana
+Sistema de Retrieval-Augmented Generation (RAG) aplicado a documentos PDF de normativa financiera peruana.
+El proyecto integra modelos de lenguaje, recuperación híbrida y evaluación automática para generar respuestas fundamentadas y trazables.
 
-Proyecto académico de IA Generativa que implementa un sistema completo de Retrieval-Augmented Generation (RAG) para consultar documentos PDF y generar respuestas fundamentadas, reduciendo alucinaciones y asegurando trazabilidad.
-
-🎯 Objetivo
+Objetivo
 
 Desarrollar un sistema capaz de:
 
-📄 Consultar documentos propios (PDFs — Resolución SBS 1660-2025)
-🧠 Generar respuestas usando un LLM cuantizado (Phi-2 4-bit)
-🔗 Reducir alucinaciones mediante grounding y prompting controlado
-📊 Evaluar automáticamente la calidad de las respuestas
-📌 Garantizar trazabilidad con citas por oración
-🧩 Arquitectura del Sistema
+Consultar documentos PDF propios
+Generar respuestas usando un modelo de lenguaje cuantizado (Phi-2 4-bit)
+Reducir alucinaciones mediante grounding
+Evaluar automáticamente la calidad de las respuestas
+Proveer trazabilidad mediante citas por oración
+Arquitectura del sistema
 PDFs 
- → Chunking (size=400, overlap=100) 
- → Embeddings 
- → FAISS (HNSW) + BM25 
- → Cross-Encoder Reranker 
- → LLM (Phi-2 4-bit) 
- → Evaluación (Grounding + BLEU + ROUGE)
-🧠 Tecnologías Utilizadas
+→ Chunking (size=400, overlap=100) 
+→ Embeddings 
+→ FAISS (HNSW) + BM25 
+→ Reranking (Cross-Encoder) 
+→ LLM (Phi-2 4-bit) 
+→ Evaluación
+Tecnologías utilizadas
 Python
 HuggingFace Transformers
-Microsoft Phi-2 (2.7B, cuantizado 4-bit)
-FAISS HNSW (búsqueda vectorial eficiente)
-BM25 (rank_bm25, búsqueda léxica)
+Microsoft Phi-2 (2.7B parámetros, 4-bit)
+FAISS (HNSW)
+BM25 (rank_bm25)
 SentenceTransformers
-paraphrase-multilingual-MiniLM-L12-v2
-Cross-Encoder
-ms-marco-MiniLM-L-6-v2
-NLTK / BLEU / ROUGE
-BitsAndBytes (cuantización)
-PyPDF (extracción de texto)
-🚀 Instalación y Ejecución
+Cross-Encoder (ms-marco-MiniLM-L-6-v2)
+NLTK (BLEU, ROUGE)
+BitsAndBytes
+PyPDF
+Instalación y ejecución
 git clone https://github.com/Jeison817/rag-system-llm.git
 cd rag-system-llm
 pip install -r requirements.txt
 jupyter notebook notebook/PF_IAGenerativa_phi2.ipynb
 
-⚠️ Antes de ejecutar, agrega tus PDFs en:
+Antes de ejecutar, agrega tus documentos en:
 
 /content/docs
-🧪 Ejemplo de Uso
+Ejemplo de uso
 query = "¿Qué es Gestión de activos y pasivos?"
 
 docs    = retrieve(query, k=10)
@@ -57,34 +54,33 @@ score, verdict = hallucination_guard(answer, top)
 
 print("RESPUESTA:\n", answer)
 print("\nGrounding score:", score, verdict)
-📊 Evaluación del Sistema
+Evaluación
 
 El sistema incluye métricas automáticas para medir calidad y confiabilidad:
 
 Métrica	Descripción	Interpretación
-Grounding Score	% de términos alineados con el contexto	> 0.70 → ✅ Confiable
-BLEU-1	Coincidencia léxica	0.1 – 0.3 aceptable
+Grounding Score	% de términos alineados al contexto	> 0.70 confiable
+BLEU-1	Coincidencia léxica con referencia	0.1 – 0.3 aceptable
 ROUGE-L	Coherencia estructural	Complementaria
-📈 Resultados
+Resultados
 =================================================================
 Pregunta                       Grounding     Veredicto
 -----------------------------------------------------------------
-¿Qué flujos se consideran...     1.0000      ✅ FUNDAMENTADO
-¿Cuál es el nivel mínimo...      0.7586      ✅ FUNDAMENTADO
-¿Cuál es una función del...        ...       ✅ FUNDAMENTADO
+¿Qué flujos se consideran...     1.0000      FUNDAMENTADO
+¿Cuál es el nivel mínimo...      0.7586      FUNDAMENTADO
+¿Cuál es una función del...        ...       FUNDAMENTADO
 =================================================================
-🔖 Sistema de Citas (Trazabilidad)
+Sistema de citas
 
 Cada respuesta generada:
 
 Se divide en oraciones
-Se vincula automáticamente con chunks del documento
-Permite auditar de dónde proviene cada afirmación
+Se vincula con fragmentos del documento (chunks)
+Permite identificar la fuente de cada afirmación
 
-✔️ Esto reduce alucinaciones
-✔️ Aumenta la confiabilidad del sistema
+Esto mejora la interpretabilidad y reduce alucinaciones.
 
-📂 Estructura del Proyecto
+Estructura del proyecto
 rag-system-llm/
 ├── notebook/
 │   └── PF_IAGenerativa_phi2.ipynb
@@ -92,26 +88,28 @@ rag-system-llm/
 │   └── pipeline_arquitectura.png
 ├── requirements.txt
 └── README.md
-📌 Alcance
-✔️ Este proyecto es:
-Un sistema funcional de RAG aplicado a normativa financiera
-Implementación completa de pipeline moderno de NLP
-Uso de búsqueda híbrida (semántica + léxica)
-Integración de LLMs cuantizados
-Evaluación automática multi-métrica
-Sistema de citas por oración (explainability)
-❌ No es:
+Alcance
+
+Este proyecto es:
+
+Un sistema funcional de RAG
+Implementación de búsqueda híbrida (semántica + léxica)
+Integración de modelos cuantizados
+Pipeline completo de evaluación
+Sistema con trazabilidad de respuestas
+
+No es:
+
 Un sistema en producción
-Escalable a gran volumen (aún)
+Escalable a gran volumen
 Optimizado para latencia
-📈 Contribuciones Técnicas
+Contribuciones
 
-Este proyecto demuestra:
+El proyecto demuestra:
 
-Integración de LLMs ligeros (Phi-2 4-bit) en entornos limitados
-Uso de FAISS HNSW + BM25 (hybrid search)
-Implementación de reranking con Cross-Encoder
-Diseño de métrica propia de Grounding Score
-Pipeline completo de evaluación (BLEU + ROUGE + grounding)
-Sistema de reducción de alucinaciones basado en contexto
-🙋‍♂️ Autor
+Integración de LLMs ligeros en entornos limitados
+Uso combinado de FAISS y BM25
+Reranking con Cross-Encoder
+Evaluación automática con múltiples métricas
+Reducción de alucinaciones mediante grounding
+Autor
