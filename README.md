@@ -102,9 +102,9 @@ Resultados obtenidos sobre la Resolución SBS 1660-2025:
 
 | Pregunta | Grounding | BLEU-1 | ROUGE-L | Veredicto |
 |---|---|---|---|---|
-| Flujos en instrumentos de deuda (ASA) | 1.0000 | — | — | ✅ FUNDAMENTADO |
-| Nivel mínimo del indicador GHO | 0.7586 | — | — | ✅ FUNDAMENTADO |
-| Función del Comité de GAP | 0.8750 | — | — | ✅ FUNDAMENTADO |
+| Flujos en instrumentos de deuda (ASA) | 1.0000 | 0.1636 | 0.2466 | ✅ FUNDAMENTADO |
+| Nivel mínimo del indicador GHO | 0.7586 | 0.0989 | 0.1525 | ✅ FUNDAMENTADO |
+| Función del Comité de GAP | 0.8750 | 0.2917 | 0.3077 | ✅ FUNDAMENTADO |
 
 ---
 
@@ -163,6 +163,7 @@ Resultados obtenidos sobre la Resolución SBS 1660-2025:
 
 ---
 
-## 📄 Licencia
+## 📄 Autores
 
-Este proyecto fue desarrollado con fines académicos.
+- **Fernando Miguel Alpiste Tuesta**
+- **Jeison Josimar Contreras Meza**
