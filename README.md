@@ -4,6 +4,18 @@ Un pipeline completo de **Retrieval-Augmented Generation (RAG)** implementado en
 
 ---
 
+🎯 Objetivo
+
+Implementar un pipeline de Retrieval-Augmented Generation (RAG) que:
+
+* minimice alucinaciones
+* asegure trazabilidad
+* permita evaluación automática de respuestas
+
+Este proyecto demuestra habilidades en:
+pipelines de datos, búsqueda híbrida, NLP y evaluación de modelos
+
+
 ## 🧠 ¿Qué hace este proyecto?
 
 El sistema responde preguntas usando **exclusivamente** la información contenida en los documentos proporcionados, minimizando alucinaciones y asegurando trazabilidad por oración en cada respuesta.
