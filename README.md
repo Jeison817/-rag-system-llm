@@ -164,6 +164,4 @@ Resultados obtenidos sobre la Resolución SBS 1660-2025:
 ---
 
 ## 📄 Autores
-
-- **Fernando Miguel Alpiste Tuesta**
 - **Jeison Josimar Contreras Meza**
