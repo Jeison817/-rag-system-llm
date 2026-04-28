@@ -175,5 +175,5 @@ Resultados obtenidos sobre la Resolución SBS 1660-2025:
 
 ---
 
-## 📄 Autores
+## 📄 Autor
 - **Jeison Josimar Contreras Meza**
